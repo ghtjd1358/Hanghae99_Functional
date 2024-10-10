@@ -6,14 +6,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ProductInfoTableRow } from '@/pages/cart/components/ProductInfoTableRow';
-import { selectUser } from '@/store/auth/authSelectors';
-import { selectCart } from '@/store/cart/cartSelectors';
-import { useAppSelector } from '@/store/hooks';
+import { selectCart } from '@/store/cart/cartSelectors'; 
 import React from 'react';
+import useUserAuth, {selectIsUser} from '../../../store/auth/useAuthBear';
+
 
 export const ProductInfoTable = () => {
-  const cart = useAppSelector(selectCart);
-  const user = useAppSelector(selectUser);
+  const cart = useAppSelector(selectCart); 
+  const user = useUserAuth(selectIsUser); 
 
   return (
     <Table>

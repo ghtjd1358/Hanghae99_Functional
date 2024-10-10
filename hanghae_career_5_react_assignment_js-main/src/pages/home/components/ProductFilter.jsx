@@ -8,14 +8,14 @@ import {
   setMaxPrice,
   setMinPrice,
   setTitle,
-} from '@/store/filter/filterActions';
-import { selectFilter } from '@/store/filter/filterSelectors';
+} from '../../../store/filter/filterSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { debounce } from '@/utils/common';
 import React from 'react';
 import { CategoryRadioGroup } from './CategoryRadioGroup';
 import { PriceRange } from './PriceRange';
 import { SearchBar } from './SearchBar';
+import { selectFilter } from '../../../store/filter/filterSlice';
 
 const ProductFilterBox = ({ children }) => (
   <Card className="my-4">

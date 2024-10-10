@@ -3,6 +3,7 @@ import { useAppSelector } from '@/store/hooks';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { NavigationBar } from './NavigationBar';
+import useUserAuth, {selectIsLogin} from '../../../store/auth/useAuthBear';
 
 export const authStatusType = {
   NEED_LOGIN: 'NEED_LOGIN',
@@ -15,7 +16,7 @@ export const Layout = ({
   containerClassName = '',
   authStatus = authStatusType.COMMON,
 }) => {
-  const { isLogin } = useAppSelector((state) => state.auth);
+  const { isLogin } = useUserAuth(selectIsLogin);
 
   if (authStatus === authStatusType.NEED_LOGIN && !isLogin) {
     return <Navigate to={pageRoutes.login} />;

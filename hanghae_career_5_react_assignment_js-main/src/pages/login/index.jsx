@@ -1,22 +1,21 @@
+import React, { useState } from 'react'; 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import Cookies from 'js-cookie';
 import { Lock, Mail } from 'lucide-react';
-import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import Cookies from 'js-cookie';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { pageRoutes } from '@/apiRoutes';
 import { EMAIL_PATTERN } from '@/constants';
 import { auth } from '@/firebase';
 import { Layout, authStatusType } from '@/pages/common/components/Layout';
-import { setIsLogin, setUser } from '@/store/auth/authSlice';
-import { useAppDispatch } from '@/store/hooks';
+import userAuthBear from '../../store/auth/useAuthBear';
 
 export const LoginPage = () => {
+  const { user, setIsLogin, setUser } = userAuthBear();
+  console.log(user)
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +26,7 @@ export const LoginPage = () => {
   };
 
   const validateForm = () => {
-    let formErrors = {};
+    const formErrors = {};
     if (!email) {
       formErrors.email = '이메일을 입력하세요';
     } else if (!EMAIL_PATTERN.test(email)) {
@@ -44,36 +43,26 @@ export const LoginPage = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        console.log('2번째', user)
         const token = await user.getIdToken();
-
+        
+        // Store the token in cookies
         Cookies.set('accessToken', token, { expires: 7 });
 
-        dispatch(setIsLogin(true));
-        if (user) {
-          dispatch(
-            setUser({
-              uid: user.uid,
-              email: user.email ?? '',
-              displayName: user.displayName ?? '',
-            })
-          );
-        }
+        // Set user in Zustand store
+        setIsLogin(true);
+        setUser({
+          uid: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || '',
+        });
 
         navigate(pageRoutes.main);
       } catch (error) {
-        console.error(
-          '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.',
-          error
-        );
-        setErrors({
-          form: '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.',
-        });
+        console.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.', error);
+        setErrors({ form: '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.' });
       }
     }
   };
@@ -94,9 +83,7 @@ export const LoginPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">비밀번호</Label>
@@ -110,20 +97,14 @@ export const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
           </div>
           {errors.form && <p className="text-sm text-red-500">{errors.form}</p>}
           <Button type="submit" className="w-full" aria-label="로그인">
             로그인
           </Button>
         </form>
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleClickRegister}
-        >
+        <Button variant="outline" className="w-full" onClick={handleClickRegister}>
           회원가입
         </Button>
       </div>

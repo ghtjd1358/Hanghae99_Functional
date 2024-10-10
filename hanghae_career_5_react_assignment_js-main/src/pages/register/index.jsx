@@ -4,20 +4,15 @@ import { Label } from '@/components/ui/label';
 import { Lock, Mail, User } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { pageRoutes } from '@/apiRoutes';
 import { EMAIL_PATTERN } from '@/constants';
 import { Layout, authStatusType } from '@/pages/common/components/Layout';
-import { registerUser } from '@/store/auth/authActions';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import useAuthBear from '../../store/auth/useAuthBear';
+
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { registerStatus, registerError } = useAppSelector(
-    (state) => state.auth
-  );
-
+  const { registerStatus, registerUser ,registerError } = useAuthBear();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,7 +41,7 @@ export const RegisterPage = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        await dispatch(registerUser({ email, password, name })).unwrap();
+        await registerUser({ email, password, name });
         console.log('가입 성공!');
         navigate(pageRoutes.login);
       } catch (error) {

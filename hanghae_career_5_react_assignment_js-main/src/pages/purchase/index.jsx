@@ -13,7 +13,6 @@ import { Layout, authStatusType } from '@/pages/common/components/Layout';
 import { ItemList } from '@/pages/purchase/components/ItemList';
 import { Payment } from '@/pages/purchase/components/Payment';
 import { ShippingInformationForm } from '@/pages/purchase/components/ShippingInformationForm';
-import { selectUser } from '@/store/auth/authSelectors';
 import { selectCart } from '@/store/cart/cartSelectors';
 import { resetCart } from '@/store/cart/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -22,11 +21,12 @@ import {
   purchaseStart,
   purchaseSuccess,
 } from '@/store/purchase/purchaseSlice';
+import useUserAuth, {selectIsUser} from '../../store/auth/useAuthBear';
 
 export const Purchase = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector(selectUser);
+  const user = useUserAuth(selectIsUser);
   const cart = useAppSelector(selectCart);
   const { isLoading } = useAppSelector((state) => state.purchase);
 

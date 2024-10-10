@@ -1,16 +1,14 @@
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Plus } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { pageRoutes } from '@/apiRoutes';
 import { PRODUCT_PAGE_SIZE } from '@/constants';
 import { extractIndexLink, isFirebaseIndexError } from '@/helpers/error';
 import { useModal } from '@/hooks/useModal';
 import { FirebaseIndexErrorModal } from '@/pages/error/components/FirebaseIndexErrorModal';
-import { selectIsLogin, selectUser } from '@/store/auth/authSelectors';
 import { addCartItem } from '@/store/cart/cartSlice';
-import { selectFilter } from '@/store/filter/filterSelectors';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loadProducts } from '@/store/product/productsActions';
 import {
@@ -24,6 +22,9 @@ import { ProductCardSkeleton } from '../skeletons/ProductCardSkeleton';
 import { EmptyProduct } from './EmptyProduct';
 import { ProductCard } from './ProductCard';
 import { ProductRegistrationModal } from './ProductRegistrationModal';
+import useUserAuth, {selectIsLogin, selectIsUser} from '../../../store/auth/useAuthBear';
+import { selectFilter } from '../../../store/filter/filterSlice';
+
 
 export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
   const navigate = useNavigate();
@@ -37,8 +38,8 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
   const hasNextPage = useAppSelector(selectHasNextPage);
   const isLoading = useAppSelector(selectIsLoading);
   const filter = useAppSelector(selectFilter);
-  const user = useAppSelector(selectUser);
-  const isLogin = useAppSelector(selectIsLogin);
+  const user = useUserAuth(selectIsUser);
+  const isLogin = useUserAuth(selectIsLogin);
   const totalCount = useAppSelector(selectTotalCount);
 
   const loadProductsData = async (isInitial = false) => {
