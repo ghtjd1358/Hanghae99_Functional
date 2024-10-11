@@ -1,12 +1,15 @@
 import { CartTable } from '@/pages/cart/components/CartTable';
 import { EmptyNotice } from '@/pages/cart/components/EmptyNotice';
 import { Layout, authStatusType } from '@/pages/common/components/Layout';
-import { selectCart } from '@/store/cart/cartSelectors';
-import { useAppSelector } from '@/store/hooks';
+// import { useAppSelector } from '@/store/hooks';
 import React from 'react';
+import cartBear from '../../store/cart/cartBear';
+
 
 export const Cart = () => {
-  const cart = useAppSelector(selectCart);
+  // const cart = useAppSelector(selectCart);
+    const { cart } = cartBear()
+
   const isExist = cart.length > 0;
 
   return (

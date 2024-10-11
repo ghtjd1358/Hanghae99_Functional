@@ -3,19 +3,22 @@ import { Input } from '@/components/ui/input';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { MAX_CART_VALUE } from '@/constants';
 import { cartValidationMessages } from '@/messages';
-import { changeCartItemCount, removeCartItem } from '@/store/cart/cartSlice';
-import { useAppDispatch } from '@/store/hooks';
+// import { changeCartItemCount, removeCartItem } from '@/store/cart/cartSlice';
+import cartBear from '@/store/cart/cartBear'
+// import { useAppDispatch } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatter';
 import { Trash2 } from 'lucide-react';
 import React from 'react';
 
-export const ProductInfoTableRow = ({ item, user }) => {
-  const dispatch = useAppDispatch();
+export const ProductInfoTableRow = ({ key, item, user }) => {
+  // const dispatch = useAppDispatch();
   const { id, title, count, image, price } = item;
+  const { changeCartItemCount, removeCartItem } = cartBear()
 
   const handleClickDeleteItem = () => {
     if (user) {
-      dispatch(removeCartItem({ itemId: id, userId: user.uid }));
+      // dispatch(removeCartItem({ itemId: id, userId: user.uid }));
+      removeCartItem({ itemId: id, userId: user.uid });
     }
   };
 
@@ -28,14 +31,15 @@ export const ProductInfoTableRow = ({ item, user }) => {
     }
 
     if (user) {
-      dispatch(
-        changeCartItemCount({ itemId: id, userId: user.uid, count: newCount })
-      );
+      // dispatch(
+      //   changeCartItemCount({ itemId: id, userId: user.uid, count: newCount })
+      // );
+      changeCartItemCount({ itemId: id, userId: user.uid, count: newCount })
     }
   };
 
   return (
-    <TableRow>
+    <TableRow key={id}>
       <TableCell className="text-center">
         <img src={image} height="80" alt={title} />
       </TableCell>

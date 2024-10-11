@@ -1,15 +1,18 @@
 import { pageRoutes } from '@/apiRoutes';
 import { Button } from '@/components/ui/button';
-import { selectTotalCount, selectTotalPrice } from '@/store/cart/cartSelectors';
-import { useAppSelector } from '@/store/hooks';
+// import { selectTotalCount, selectTotalPrice } from '@/store/cart/cartSelectors';
+// import { useAppSelector } from '@/store/hooks';
 import { formatNumber, formatPrice } from '@/utils/formatter';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+// import { selectTotalCount, selectTotalPrice } from '../../../store/cart/cartSlice';
+import cartBear from '../../../store/cart/cartBear'
 
 export const PriceSummary = () => {
   const navigate = useNavigate();
-  const totalCount = useAppSelector(selectTotalCount);
-  const totalPrice = useAppSelector(selectTotalPrice);
+  // const totalCount = useAppSelector(selectTotalCount);
+  // const totalPrice = useAppSelector(selectTotalPrice);
+  const { totalCount, totalPrice } = cartBear()
 
   const handleClickPurchase = () => {
     navigate(pageRoutes.purchase);

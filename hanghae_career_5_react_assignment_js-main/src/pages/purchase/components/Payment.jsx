@@ -4,12 +4,14 @@ import { CreditCard } from 'lucide-react';
 import React from 'react';
 
 import { PaymentMethodTableRow } from '@/pages/purchase/components/PaymentMethodTableRow';
-import { selectTotalPrice } from '@/store/cart/cartSelectors';
-import { useAppSelector } from '@/store/hooks';
+// import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatter';
+// import { selectTotalPrice } from '../../../store/cart/cartSlice';
+import cartBear from '../../../store/cart/cartBear'
 
 export const Payment = ({ paymentMethod, onPaymentMethodChange }) => {
-  const totalPrice = useAppSelector(selectTotalPrice);
+  // const totalPrice = useAppSelector(selectTotalPrice);
+  const { totalPrice } = cartBear()
   const shippingCost = 3000;
 
   const getTotalPrice = () => {

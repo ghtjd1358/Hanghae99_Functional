@@ -4,19 +4,23 @@ import { Label } from '@/components/ui/label';
 import { Lock, Mail, User } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form'; // react-hook-form import
 import { pageRoutes } from '@/apiRoutes';
 import { EMAIL_PATTERN } from '@/constants';
 import { Layout, authStatusType } from '@/pages/common/components/Layout';
 import useAuthBear from '../../store/auth/useAuthBear';
 
-
 export const RegisterPage = () => {
   const navigate = useNavigate();
-  const { registerStatus, registerUser ,registerError } = useAuthBear();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+  const { registerStatus, registerUser, registerError } = useAuthBear();
+  // const [errors, setErrors] = useState({});
+
+  // react-hook-form hooks
+  const {
+    register,
+    handleSubmit,
+    formState: { errors: formErrors },
+  } = useForm();
 
   useEffect(() => {
     if (registerStatus === 'succeeded') {
@@ -24,54 +28,20 @@ export const RegisterPage = () => {
     }
   }, [registerStatus, navigate]);
 
-  const validateForm = () => {
-    let formErrors = {};
-    if (!name) formErrors.name = '이름을 입력하세요';
-    if (!email) {
-      formErrors.email = '이메일을 입력하세요';
-    } else if (!EMAIL_PATTERN.test(email)) {
-      formErrors.email = '이메일 양식이 올바르지 않습니다';
-    }
-    if (!password) formErrors.password = '비밀번호를 입력하세요';
-    setErrors(formErrors);
-    return Object.keys(formErrors).length === 0;
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      try {
-        await registerUser({ email, password, name });
-        console.log('가입 성공!');
-        navigate(pageRoutes.login);
-      } catch (error) {
-        console.error(
-          '회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.',
-          error
-        );
-      }
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    switch (id) {
-      case 'name':
-        setName(value);
-        break;
-      case 'email':
-        setEmail(value);
-        break;
-      case 'password':
-        setPassword(value);
-        break;
+  const onSubmit = async (data) => {
+    try {
+      await registerUser({ email: data.email, password: data.password, name: data.name });
+      console.log('가입 성공!');
+      navigate(pageRoutes.login);
+    } catch (error) {
+      console.error('회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.', error);
     }
   };
 
   return (
     <Layout authStatus={authStatusType.NEED_NOT_LOGIN}>
       <div className="w-full h-screen max-w-md mx-auto space-y-8 flex flex-col justify-center">
-        <form onSubmit={handleRegister} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">이름</Label>
             <div className="relative">
@@ -80,12 +50,11 @@ export const RegisterPage = () => {
                 id="name"
                 type="text"
                 className="pl-10"
-                value={name}
-                onChange={handleInputChange}
+                {...register('name', { required: '이름을 입력하세요' })}
               />
             </div>
-            {errors.name && (
-              <p className="text-sm text-red-500">{errors.name}</p>
+            {formErrors.name && (
+              <p className="text-sm text-red-500">{formErrors.name.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -96,12 +65,17 @@ export const RegisterPage = () => {
                 id="email"
                 type="email"
                 className="pl-10"
-                value={email}
-                onChange={handleInputChange}
+                {...register('email', {
+                  required: '이메일을 입력하세요',
+                  pattern: {
+                    value: EMAIL_PATTERN,
+                    message: '이메일 양식이 올바르지 않습니다',
+                  },
+                })}
               />
             </div>
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email}</p>
+            {formErrors.email && (
+              <p className="text-sm text-red-500">{formErrors.email.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -112,12 +86,11 @@ export const RegisterPage = () => {
                 id="password"
                 type="password"
                 className="pl-10"
-                value={password}
-                onChange={handleInputChange}
+                {...register('password', { required: '비밀번호를 입력하세요' })}
               />
             </div>
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password}</p>
+            {formErrors.password && (
+              <p className="text-sm text-red-500">{formErrors.password.message}</p>
             )}
           </div>
           <Button

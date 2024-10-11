@@ -8,51 +8,50 @@ import { PRODUCT_PAGE_SIZE } from '@/constants';
 import { extractIndexLink, isFirebaseIndexError } from '@/helpers/error';
 import { useModal } from '@/hooks/useModal';
 import { FirebaseIndexErrorModal } from '@/pages/error/components/FirebaseIndexErrorModal';
-import { addCartItem } from '@/store/cart/cartSlice';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loadProducts } from '@/store/product/productsActions';
-import {
-  selectHasNextPage,
-  selectIsLoading,
-  selectProducts,
-  selectTotalCount,
-} from '@/store/product/productsSelectors';
-
+// import { addCartItem } from '@/store/cart/cartSlice';
+// import { useAppDispatch, useAppSelector } from '@/store/hooks';
+// import {
+//   selectHasNextPage,
+//   selectIsLoading,
+//   selectProducts,
+//   selectTotalCount,
+// } from '@/store/product/productsSlice';
+import productsBear from '@/store/product/productsBear'
 import { ProductCardSkeleton } from '../skeletons/ProductCardSkeleton';
 import { EmptyProduct } from './EmptyProduct';
 import { ProductCard } from './ProductCard';
 import { ProductRegistrationModal } from './ProductRegistrationModal';
-import useUserAuth, {selectIsLogin, selectIsUser} from '../../../store/auth/useAuthBear';
-import { selectFilter } from '../../../store/filter/filterSlice';
+import useAuthBear from '../../../store/auth/useAuthBear';
+import useFilterBear from '../../../store/filter/useFilterBear';
+import cartBear from '../../../store/cart/cartBear'
+// import { loadProducts } from '../../../store/product/productsSlice';
 
 
 export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const { isOpen, openModal, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [isIndexErrorModalOpen, setIsIndexErrorModalOpen] = useState(false);
   const [indexLink, setIndexLink] = useState(null);
+  // const products = useAppSelector(selectProducts);
+  // const hasNextPage = useAppSelector(selectHasNextPage);
+  // const isLoading = useAppSelector(selectIsLoading);
+  // const totalCount = useAppSelector(selectTotalCount);
+  const { items : products, hasNextPage, isLoading, totalCount, loadProducts } = productsBear()
+  const { addCartItem } = cartBear()
 
-  const products = useAppSelector(selectProducts);
-  const hasNextPage = useAppSelector(selectHasNextPage);
-  const isLoading = useAppSelector(selectIsLoading);
-  const filter = useAppSelector(selectFilter);
-  const user = useUserAuth(selectIsUser);
-  const isLogin = useUserAuth(selectIsLogin);
-  const totalCount = useAppSelector(selectTotalCount);
+
+
+
+  const { user, isLogin } = useAuthBear();  
+  const { filterState : filter } = useFilterBear()
 
   const loadProductsData = async (isInitial = false) => {
     try {
       const page = isInitial ? 1 : currentPage + 1;
-      await dispatch(
-        loadProducts({
-          filter,
-          pageSize,
-          page,
-          isInitial,
-        })
-      ).unwrap();
+      // await dispatch(loadProducts({filter,pageSize,page,isInitial,}));
+      await loadProducts({filter,pageSize,page,isInitial,});
       if (!isInitial) {
         setCurrentPage(page);
       }
@@ -77,7 +76,8 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
   const handleCartAction = (product) => {
     if (isLogin && user) {
       const cartItem = { ...product, count: 1 };
-      dispatch(addCartItem({ item: cartItem, userId: user.uid, count: 1 }));
+      // dispatch(addCartItem({ item: cartItem, userId: user.uid, count: 1 }));
+      addCartItem({ item: cartItem, userId: user.uid, count: 1 })
       console.log(`${product.title} 상품이 \n장바구니에 담겼습니다.`);
     } else {
       navigate(pageRoutes.login);
@@ -87,7 +87,8 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
   const handlePurchaseAction = (product) => {
     if (isLogin && user) {
       const cartItem = { ...product, count: 1 };
-      dispatch(addCartItem({ item: cartItem, userId: user.uid, count: 1 }));
+      // dispatch(addCartItem({ item: cartItem, userId: user.uid, count: 1 }));
+      addCartItem({ item: cartItem, userId: user.uid, count: 1 })
       navigate(pageRoutes.cart);
     } else {
       navigate(pageRoutes.login);

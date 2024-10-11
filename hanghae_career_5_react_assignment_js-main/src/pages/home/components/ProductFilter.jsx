@@ -3,19 +3,13 @@ import { Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 
 import { ApiErrorBoundary } from '@/pages/common/components/ApiErrorBoundary';
-import {
-  setCategoryId,
-  setMaxPrice,
-  setMinPrice,
-  setTitle,
-} from '../../../store/filter/filterSlice';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+// import { useAppDispatch } from '@/store/hooks';
 import { debounce } from '@/utils/common';
 import React from 'react';
 import { CategoryRadioGroup } from './CategoryRadioGroup';
 import { PriceRange } from './PriceRange';
 import { SearchBar } from './SearchBar';
-import { selectFilter } from '../../../store/filter/filterSlice';
+import useFilterBear from '../../../store/filter/useFilterBear'
 
 const ProductFilterBox = ({ children }) => (
   <Card className="my-4">
@@ -24,22 +18,33 @@ const ProductFilterBox = ({ children }) => (
 );
 
 export const ProductFilter = () => {
-  const dispatch = useAppDispatch();
-  const filterState = useAppSelector(selectFilter);
+  // const dispatch = useAppDispatch();
+
+  const { 
+    filterState,    
+    setMinPrice,
+    setMaxPrice,
+    setTitle,
+    setCategoryId,
+  } = useFilterBear()
+
 
   const handleChangeInput = debounce((e) => {
-    dispatch(setTitle(e.target.value));
+    // dispatch(setTitle(e.target.value));
+    setTitle(e.target.value)
   }, 300);
 
   const handlePriceChange = (actionCreator) =>
     debounce((e) => {
       const value = e.target.value;
       if (value === '') {
-        dispatch(actionCreator(-1));
+        // dispatch(actionCreator(-1));
+        actionCreator(-1)
       } else {
         const numericValue = Math.max(0, parseInt(value, 10));
         if (!isNaN(numericValue)) {
-          dispatch(actionCreator(numericValue));
+          // dispatch(actionCreator(numericValue));
+          actionCreator(numericValue)
         }
       }
     }, 300);
@@ -49,7 +54,8 @@ export const ProductFilter = () => {
 
   const handleChangeCategory = (value) => {
     if (value !== undefined) {
-      dispatch(setCategoryId(value));
+      // dispatch(setCategoryId(value));
+      setCategoryId(value)
     } else {
       console.error('카테고리가 설정되지 않았습니다.');
     }
@@ -64,7 +70,7 @@ export const ProductFilter = () => {
         <ApiErrorBoundary>
           <Suspense fallback={<Loader2 className="h-24 w-24 animate-spin" />}>
             <CategoryRadioGroup
-              categoryId={filterState.categoryId}
+              categoryId={filterState}
               onChangeCategory={handleChangeCategory}
             />
           </Suspense>

@@ -1,43 +1,43 @@
 import { pageRoutes } from '@/apiRoutes';
 import { ApiErrorBoundary } from '@/pages/common/components/ApiErrorBoundary';
 
-import { initCart } from '@/store/cart/cartSlice';
+// import { initCart } from '@/store/cart/cartSlice';
 import Cookies from 'js-cookie';
 import React, { Suspense, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useModal } from '@/hooks/useModal';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+// import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { CartButton } from './CartButton';
 import { ConfirmModal } from './ConfirmModal';
 import { LoginButton } from './LoginButton';
 import { LogoutButton } from './LogoutButton';
 import useAuthBear from '../../../store/auth/useAuthBear'
+import cartBear from '../../../store/cart/cartBear'
 
 
 export const NavigationBar = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const { isOpen, openModal, closeModal } = useModal();
-  const { isLogin, user } = useAuthBear();
-  console.log('참', isLogin)
-  console.log('참유저', user)
-  const { cart } = useAppSelector((state) => state.cart);
-  const { setLogOut } = useAuthBear()
+  const { isLogin, user, setLogout } = useAuthBear();
+  // const { cart } = useAppSelector((state) => state.cart);
+  const { cart, initCart } = cartBear()
   
 
   useEffect(() => {
     if (isLogin && user && !cart.length ) {
-      dispatch(initCart(user.uid));
+      // dispatch(initCart(user.uid));
+      initCart(user.uid)
     }
-  }, [isLogin, user, dispatch, cart.length]);
+  }, [isLogin, user, cart.length]);
 
   const handleLogout = () => {
     openModal();
   };
 
   const handleConfirmLogout = () => {
-    setLogOut();
+    setLogout();
     Cookies.remove('accessToken');
     closeModal();
   };
